@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaySlip Pro by Aaron Sermon</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --cream: #ede8da;
+    --rule: #c8b99a;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --green: #2d5a27;
+    --green-light: #3d7a36;
+    --red: #8b1a1a;
+    --muted: #6b5d4a;
+    --shadow: rgba(26,18,8,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(200,185,154,0.3) 27px, rgba(200,185,154,0.3) 28px);
+    padding: 40px 20px 80px;
+  }
+
+  .masthead {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .masthead h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .masthead h1 span {
+    color: var(--gold);
+  }
+
+  .masthead p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .rule-decor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    margin: 16px 0;
+  }
+  .rule-decor::before, .rule-decor::after {
+    content: '';
+    flex: 1;
+    max-width: 120px;
+    height: 1px;
+    background: var(--rule);
+  }
+  .rule-decor span { font-size: 0.7rem; color: var(--rule); }
+
+  .app-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 680px) {
+    .app-grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 28px;
+    box-shadow: 4px 4px 0 rgba(200,185,154,0.5), 8px 8px 0 rgba(200,185,154,0.2);
+    position: relative;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: -4px; bottom: -4px;
+    border: 1px solid rgba(200,185,154,0.4);
+    border-radius: 2px;
+    z-index: -1;
+  }
+
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .field-group {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    border-radius: 1px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,134,11,0.08);
+  }
+
+  input::placeholder { color: var(--rule); }
+
+  .radio-group {
+    display: flex;
+    gap: 12px;
+  }
+
+  .radio-opt {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 1px;
+  }
+
+  .radio-opt:has(input:checked) {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  .radio-opt input { width: auto; display: none; }
+  .radio-opt span { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.05em; }
+
+  .calc-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--ink);
+    color: var(--gold-light);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .calc-btn:hover {
+    background: var(--gold);
+    color: var(--ink);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  .calc-btn:active {
+    transform: translate(0, 0);
+    box-shadow: none;
+  }
+
+  /* Payslip */
+  .payslip {
+    grid-column: 1 / -1;
+    display: none;
+    animation: slideIn 0.4s ease;
+  }
+
+  .payslip.visible { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .payslip-inner {
+    background: white;
+    border: 1px solid var(--rule);
+    padding: 0;
+    box-shadow: 6px 6px 0 rgba(200,185,154,0.6), 12px 12px 0 rgba(200,185,154,0.25);
+    position: relative;
+  }
+
+  .slip-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .slip-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  .slip-header h2 span { color: var(--gold-light); }
+
+  .slip-meta {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(245,240,232,0.6);
+    line-height: 1.8;
+  }
+
+  .slip-body {
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  @media (max-width: 580px) {
+    .slip-body { grid-template-columns: 1fr; }
+    .slip-header { flex-direction: column; gap: 12px; }
+    .slip-meta { text-align: left; }
+  }
+
+  .slip-col {
+    padding: 0 16px;
+    border-right: 1px solid var(--cream);
+  }
+
+  .slip-col:first-child { padding-left: 0; }
+  .slip-col:last-child { border-right: none; }
+
+  .slip-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .line-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px dashed rgba(200,185,154,0.5);
+    font-size: 0.85rem;
+  }
+
+  .line-item:last-child { border-bottom: none; }
+
+  .line-item .item-name { color: var(--muted); font-weight: 300; }
+  .line-item .item-value { font-family: 'DM Mono', monospace; font-weight: 500; }
+
+  .line-item.deduction .item-value { color: var(--red); }
+  .line-item.earning .item-value { color: var(--green); }
+
+  .slip-footer {
+    margin: 0 32px 28px;
+    padding: 20px 24px;
+    background: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .net-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(245,240,232,0.6);
+  }
+
+  .net-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold-light);
+  }
+
+  .print-btn {
+    display: block;
+    width: calc(100% - 64px);
+    margin: 0 32px 28px;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .print-btn:hover {
+    background: var(--cream);
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .inline-help {
+    font-size: 0.7rem;
+    color: var(--rule);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .app-grid > .card:not(.payslip) { display: none; }
+    .payslip { grid-column: 1; display: block; }
+    .masthead, .print-btn { display: none; }
+    .payslip-inner { box-shadow: none; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <h1>Pay<span>Slip</span> Pro</h1>
+  <div class="rule-decor"><span>✦</span></div>
+  <p>By Aaron Sermon &nbsp;·&nbsp; Small Business Payroll Calculator</p>
+</div>
+
+<div class="app-grid">
+
+  <!-- Employee Details -->
+  <div class="card">
+    <div class="section-title">§ 01 — Employee Details</div>
+
+    <div class="field-group">
+      <label>Full Name</label>
+      <input type="text" id="empName" placeholder="e.g. Jane Smith">
+    </div>
+
+    <div class="field-group">
+      <label>Employee ID</label>
+      <input type="text" id="empId" placeholder="e.g. EMP-0042">
+    </div>
+
+    <div class="field-group">
+      <label>Department</label>
+      <input type="text" id="empDept" placeholder="e.g. Sales">
+    </div>
+
+    <div class="field-group">
+      <label>Pay Period</label>
+      <input type="month" id="payPeriod">
+    </div>
+
+    <div class="field-group">
+      <label>Pay Type</label>
+      <div class="radio-group">
+        <label class="radio-opt">
+          <input type="radio" name="payType" value="hourly" checked onchange="togglePayType()">
+          <span>Hourly</span>
+        </label>
+        <label class="radio-opt">
+          <input type="radio" name="payType" value="salary" onchange="togglePayType()">
+          <span>Salary</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Earnings -->
+  <div class="card">
+    <div class="section-title">§ 02 — Earnings & Deductions</div>
+
+    <div id="hourlyFields">
+      <div class="field-group">
+        <label>Hours Worked</label>
+        <input type="number" id="hoursWorked" placeholder="e.g. 160" min="0" step="0.5">
+      </div>
+      <div class="field-group">
+        <label>Hourly Rate (£)</label>
+        <input type="number" id="hourlyRate" placeholder="e.g. 15.00" min="0" step="0.01">
+      </div>
+      <div class="field-group">
+        <label>Overtime Hours</label>
+        <input type="number" id="overtimeHours" placeholder="e.g. 8" min="0" step="0.5">
+        <p class="inline-help">Paid at 1.5× the hourly rate</p>
+      </div>
+    </div>
+
+    <div id="salaryFields" style="display:none">
+      <div class="field-group">
+        <label>Annual Salary (£)</label>
+        <input type="number" id="annualSalary" placeholder="e.g. 36000" min="0">
+        <p class="inline-help">Monthly gross = salary ÷ 12</p>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Tax Rate (%)</label>
+      <input type="number" id="taxRate" placeholder="e.g. 20" min="0" max="100" step="0.1" value="20">
+    </div>
+
+    <div class="field-group">
+      <label>National Insurance / Pension (%)</label>
+      <input type="number" id="niRate" placeholder="e.g. 8" min="0" max="100" step="0.1" value="8">
+    </div>
+
+    <div class="field-group">
+      <label>Other Deductions (£)</label>
+      <input type="number" id="otherDeductions" placeholder="e.g. 50.00" min="0" step="0.01" value="0">
+      <p class="inline-help">Fixed amount (benefits, loans, etc.)</p>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Generate Payslip →</button>
+  </div>
+
+  <!-- Payslip Output -->
+  <div class="payslip card" id="payslipSection">
+    <div class="section-title">§ 03 — Payslip Summary</div>
+    <div class="payslip-inner">
+
+      <div class="slip-header">
+        <div>
+          <h2>Pay<span>Slip</span></h2>
+          <div id="slipEmployee" style="font-size:0.8rem; margin-top:6px; color:rgba(245,240,232,0.7); font-family:'DM Mono',monospace;"></div>
+        </div>
+        <div class="slip-meta" id="slipMeta"></div>
+      </div>
+
+      <div class="slip-body">
+        <div class="slip-col">
+          <div class="slip-section-label">Earnings</div>
+          <div id="earningsList"></div>
+        </div>
+        <div class="slip-col">
+          <div class="slip-section-label">Deductions</div>
+          <div id="deductionsList"></div>
+        </div>
+      </div>
+
+      <div class="slip-footer">
+        <div>
+          <div class="net-label">Net Pay</div>
+          <div style="font-family:'DM Mono',monospace; font-size:0.65rem; color:rgba(245,240,232,0.4); margin-top:2px;">After all deductions</div>
+        </div>
+        <div class="net-value" id="netPayDisplay">£0.00</div>
+      </div>
+
+      <button class="print-btn" onclick="window.print()">⬛ Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Set default pay period to current month
+  const now = new Date();
+  document.getElementById('payPeriod').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  function togglePayType() {
+    const isHourly = document.querySelector('input[name="payType"]:checked').value === 'hourly';
+    document.getElementById('hourlyFields').style.display = isHourly ? 'block' : 'none';
+    document.getElementById('salaryFields').style.display = isHourly ? 'none' : 'block';
+  }
+
+  function fmt(n) {
+    return '£' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function lineItem(name, value, type = '') {
+    return `<div class="line-item ${type}">
+      <span class="item-name">${name}</span>
+      <span class="item-value">${fmt(value)}</span>
+    </div>`;
+  }
+
+  function calculate() {
+    const name = document.getElementById('empName').value || 'Employee';
+    const empId = document.getElementById('empId').value || '—';
+    const dept = document.getElementById('empDept').value || '—';
+    const period = document.getElementById('payPeriod').value;
+    const payType = document.querySelector('input[name="payType"]:checked').value;
+
+    let grossPay = 0;
+    let earningsHTML = '';
+
+    if (payType === 'hourly') {
+      const hours = parseFloat(document.getElementById('hoursWorked').value) || 0;
+      const rate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+      const overtime = parseFloat(document.getElementById('overtimeHours').value) || 0;
+      const basePay = hours * rate;
+      const overtimePay = overtime * rate * 1.5;
+      grossPay = basePay + overtimePay;
+
+      earningsHTML += lineItem(`Regular Pay (${hours}h × ${fmt(rate)})`, basePay, 'earning');
+      if (overtime > 0) earningsHTML += lineItem(`Overtime (${overtime}h × 1.5)`, overtimePay, 'earning');
+    } else {
+      const annual = parseFloat(document.getElementById('annualSalary').value) || 0;
+      const monthly = annual / 12;
+      grossPay = monthly;
+      earningsHTML += lineItem(`Monthly Salary (£${annual.toLocaleString()} ÷ 12)`, monthly, 'earning');
+    }
+
+    earningsHTML += lineItem('Gross Pay', grossPay, 'earning');
+
+    const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+    const niRate = parseFloat(document.getElementById('niRate').value) || 0;
+    const otherDed = parseFloat(document.getElementById('otherDeductions').value) || 0;
+
+    const taxAmount = grossPay * (taxRate / 100);
+    const niAmount = grossPay * (niRate / 100);
+    const totalDeductions = taxAmount + niAmount + otherDed;
+    const netPay = grossPay - totalDeductions;
+
+    let deductionsHTML = '';
+    deductionsHTML += lineItem(`Income Tax (${taxRate}%)`, taxAmount, 'deduction');
+    deductionsHTML += lineItem(`NI / Pension (${niRate}%)`, niAmount, 'deduction');
+    if (otherDed > 0) deductionsHTML += lineItem('Other Deductions', otherDed, 'deduction');
+    deductionsHTML += lineItem('Total Deductions', totalDeductions, 'deduction');
+
+    // Format period label
+    let periodLabel = '—';
+    if (period) {
+      const d = new Date(period + '-01');
+      periodLabel = d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    }
+
+    document.getElementById('slipEmployee').textContent = `${name}  ·  ID: ${empId}  ·  ${dept}`;
+    document.getElementById('slipMeta').innerHTML =
+      `Pay Period: ${periodLabel}<br>Issued: ${new Date().toLocaleDateString('en-GB')}<br>Gross: ${fmt(grossPay)}`;
+
+    document.getElementById('earningsList').innerHTML = earningsHTML;
+    document.getElementById('deductionsList').innerHTML = deductionsHTML;
+    document.getElementById('netPayDisplay').textContent = fmt(netPay < 0 ? 0 : netPay);
+
+    const slip = document.getElementById('payslipSection');
+    slip.classList.add('visible');
+    setTimeout(() => slip.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+</script>
+</body>
+</html>
